@@ -13,6 +13,7 @@ class Game {
         this.undoCountElement = document.getElementById('undoCount');
         this.gameMessage = document.getElementById('gameMessage');
         this.gameMessageText = this.gameMessage.querySelector('p');
+        this.merges = [];
         
         this.bestScoreElement.textContent = this.bestScore;
         this.init();
@@ -166,19 +167,24 @@ class Game {
     moveLeft() {
         let moved = false;
         const previousGrid = this.copyGrid(this.grid);
+        this.merges = [];
         
         for (let row = 0; row < 4; row++) {
             let currentRow = this.grid[row].filter(cell => cell !== null);
             let newRow = [];
+            let newCol = 0;
             
             for (let i = 0; i < currentRow.length; i++) {
                 if (currentRow[i] === currentRow[i + 1]) {
                     const mergedValue = currentRow[i] * 2;
                     newRow.push(mergedValue);
                     this.score += mergedValue;
+                    this.merges.push({ row, col: newCol, value: mergedValue });
+                    newCol++;
                     i++;
                 } else {
                     newRow.push(currentRow[i]);
+                    newCol++;
                 }
             }
             
@@ -194,6 +200,7 @@ class Game {
         
         if (moved) {
             this.animateTiles(previousGrid, 'left');
+            this.showMergeAnimations();
         }
         
         return moved;
@@ -202,16 +209,19 @@ class Game {
     moveRight() {
         let moved = false;
         const previousGrid = this.copyGrid(this.grid);
+        this.merges = [];
         
         for (let row = 0; row < 4; row++) {
             let currentRow = this.grid[row].filter(cell => cell !== null);
             let newRow = [];
+            let mergePositions = [];
             
             for (let i = currentRow.length - 1; i >= 0; i--) {
                 if (currentRow[i] === currentRow[i - 1]) {
                     const mergedValue = currentRow[i] * 2;
                     newRow.unshift(mergedValue);
                     this.score += mergedValue;
+                    mergePositions.unshift(newRow.length - 1);
                     i--;
                 } else {
                     newRow.unshift(currentRow[i]);
@@ -220,9 +230,14 @@ class Game {
             
             while (newRow.length < 4) {
                 newRow.unshift(null);
+                mergePositions = mergePositions.map(p => p + 1);
             }
             
             this.grid[row] = newRow;
+            
+            for (const pos of mergePositions) {
+                this.merges.push({ row, col: pos, value: newRow[pos] });
+            }
         }
         
         this.updateScore();
@@ -230,6 +245,7 @@ class Game {
         
         if (moved) {
             this.animateTiles(previousGrid, 'right');
+            this.showMergeAnimations();
         }
         
         return moved;
@@ -238,6 +254,7 @@ class Game {
     moveUp() {
         let moved = false;
         const previousGrid = this.copyGrid(this.grid);
+        this.merges = [];
         
         for (let col = 0; col < 4; col++) {
             let currentCol = [];
@@ -249,11 +266,13 @@ class Game {
             }
             
             let newCol = [];
+            let mergePositions = [];
             for (let i = 0; i < currentCol.length; i++) {
                 if (currentCol[i] === currentCol[i + 1]) {
                     const mergedValue = currentCol[i] * 2;
                     newCol.push(mergedValue);
                     this.score += mergedValue;
+                    mergePositions.push(newCol.length - 1);
                     i++;
                 } else {
                     newCol.push(currentCol[i]);
@@ -267,6 +286,10 @@ class Game {
             for (let row = 0; row < 4; row++) {
                 this.grid[row][col] = newCol[row];
             }
+            
+            for (const pos of mergePositions) {
+                this.merges.push({ row: pos, col, value: newCol[pos] });
+            }
         }
         
         this.updateScore();
@@ -274,6 +297,7 @@ class Game {
         
         if (moved) {
             this.animateTiles(previousGrid, 'up');
+            this.showMergeAnimations();
         }
         
         return moved;
@@ -282,6 +306,7 @@ class Game {
     moveDown() {
         let moved = false;
         const previousGrid = this.copyGrid(this.grid);
+        this.merges = [];
         
         for (let col = 0; col < 4; col++) {
             let currentCol = [];
@@ -293,11 +318,13 @@ class Game {
             }
             
             let newCol = [];
+            let mergePositions = [];
             for (let i = currentCol.length - 1; i >= 0; i--) {
                 if (currentCol[i] === currentCol[i - 1]) {
                     const mergedValue = currentCol[i] * 2;
                     newCol.unshift(mergedValue);
                     this.score += mergedValue;
+                    mergePositions.unshift(newCol.length - 1);
                     i--;
                 } else {
                     newCol.unshift(currentCol[i]);
@@ -306,10 +333,15 @@ class Game {
             
             while (newCol.length < 4) {
                 newCol.unshift(null);
+                mergePositions = mergePositions.map(p => p + 1);
             }
             
             for (let row = 0; row < 4; row++) {
                 this.grid[row][col] = newCol[row];
+            }
+            
+            for (const pos of mergePositions) {
+                this.merges.push({ row: pos, col, value: newCol[pos] });
             }
         }
         
@@ -318,6 +350,7 @@ class Game {
         
         if (moved) {
             this.animateTiles(previousGrid, 'down');
+            this.showMergeAnimations();
         }
         
         return moved;
@@ -348,6 +381,22 @@ class Game {
                     this.createTile(row, col, this.grid[row][col]);
                 }
             }
+        }
+    }
+    
+    showMergeAnimations() {
+        for (const merge of this.merges) {
+            const scoreAnimation = document.createElement('div');
+            scoreAnimation.className = 'score-animation';
+            scoreAnimation.textContent = `+${merge.value}`;
+            scoreAnimation.style.left = `${this.getPosition(merge.col) + 53}px`;
+            scoreAnimation.style.top = `${this.getPosition(merge.row) + 53}px`;
+            
+            this.tileContainer.appendChild(scoreAnimation);
+            
+            setTimeout(() => {
+                scoreAnimation.remove();
+            }, 1000);
         }
     }
     
