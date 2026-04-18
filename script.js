@@ -4,6 +4,8 @@ class Game {
         this.score = 0;
         this.bestScore = this.getBestScore();
         this.gameOver = false;
+        this.won = false;
+        this.keepPlaying = false;
         this.history = [];
         this.maxUndoCount = 3;
         this.undoUsed = 0;
@@ -13,9 +15,11 @@ class Game {
         this.undoCountElement = document.getElementById('undoCount');
         this.gameMessage = document.getElementById('gameMessage');
         this.gameMessageText = this.gameMessage.querySelector('p');
+        this.continueButton = document.getElementById('continueButton');
         this.merges = [];
         
         this.bestScoreElement.textContent = this.bestScore;
+        this.initTheme();
         
         if (!this.tryRestoreGame()) {
             this.init();
@@ -28,6 +32,8 @@ class Game {
         this.grid = Array(4).fill(null).map(() => Array(4).fill(null));
         this.score = 0;
         this.gameOver = false;
+        this.won = false;
+        this.keepPlaying = false;
         this.history = [];
         this.undoUsed = 0;
         this.updateScore();
@@ -49,6 +55,8 @@ class Game {
             this.grid = savedState.grid;
             this.score = savedState.score;
             this.gameOver = savedState.gameOver;
+            this.won = savedState.won || false;
+            this.keepPlaying = savedState.keepPlaying || false;
             this.history = savedState.history || [];
             this.undoUsed = savedState.undoUsed || 0;
             
@@ -108,13 +116,35 @@ class Game {
             }
         });
         
-        document.getElementById('newGameButton').addEventListener('click', () => {
-            this.init();
-        });
+        const newGameButton = document.getElementById('newGameButton');
+        if (newGameButton) {
+            newGameButton.addEventListener('click', () => {
+                this.init();
+            });
+        }
         
-        document.getElementById('retryButton').addEventListener('click', () => {
-            this.init();
-        });
+        const retryButton = document.getElementById('retryButton');
+        if (retryButton) {
+            retryButton.addEventListener('click', () => {
+                this.init();
+            });
+        }
+        
+        const continueButton = document.getElementById('continueButton');
+        if (continueButton) {
+            continueButton.addEventListener('click', () => {
+                this.keepPlaying = true;
+                this.hideGameMessage();
+                this.saveGameState();
+            });
+        }
+        
+        const themeToggleButton = document.getElementById('themeToggleButton');
+        if (themeToggleButton) {
+            themeToggleButton.addEventListener('click', () => {
+                this.toggleTheme();
+            });
+        }
     }
     
     clearTiles() {
@@ -199,6 +229,7 @@ class Game {
             
             setTimeout(() => {
                 this.addRandomTile();
+                this.checkWin();
                 this.checkGameOver();
                 this.saveGameState();
             }, 150);
@@ -475,6 +506,8 @@ class Game {
             grid: this.grid,
             score: this.score,
             gameOver: this.gameOver,
+            won: this.won,
+            keepPlaying: this.keepPlaying,
             history: this.history,
             undoUsed: this.undoUsed
         };
@@ -529,6 +562,28 @@ class Game {
         return true;
     }
     
+    checkWin() {
+        if (this.won || this.keepPlaying) {
+            return;
+        }
+        
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 4; col++) {
+                if (this.grid[row][col] === 2048) {
+                    this.won = true;
+                    this.showWinMessage();
+                    return;
+                }
+            }
+        }
+    }
+    
+    showWinMessage() {
+        this.gameMessageText.textContent = '你赢了！';
+        this.continueButton.style.display = 'inline-block';
+        this.gameMessage.classList.add('show');
+    }
+    
     checkGameOver() {
         if (this.hasEmptyCell()) {
             return;
@@ -573,11 +628,48 @@ class Game {
     
     showGameMessage(message) {
         this.gameMessageText.textContent = message;
+        this.continueButton.style.display = 'none';
         this.gameMessage.classList.add('show');
     }
     
     hideGameMessage() {
         this.gameMessage.classList.remove('show');
+    }
+    
+    initTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const themeToggleButton = document.getElementById('themeToggleButton');
+        
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            if (themeToggleButton) {
+                themeToggleButton.textContent = '☀️';
+            }
+        } else {
+            document.body.classList.remove('dark-mode');
+            if (themeToggleButton) {
+                themeToggleButton.textContent = '🌙';
+            }
+        }
+    }
+    
+    toggleTheme() {
+        const body = document.body;
+        const themeToggleButton = document.getElementById('themeToggleButton');
+        
+        if (body.classList.contains('dark-mode')) {
+            body.classList.remove('dark-mode');
+            if (themeToggleButton) {
+                themeToggleButton.textContent = '🌙';
+            }
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.classList.add('dark-mode');
+            if (themeToggleButton) {
+                themeToggleButton.textContent = '☀️';
+            }
+            localStorage.setItem('theme', 'dark');
+        }
     }
 }
 

@@ -27,7 +27,10 @@
         </div>
         <div class="game-intro">
             <p>使用键盘方向键移动方块，相同数字的方块相碰时会合并成它们的和。</p>
-            <button class="new-game-button" id="newGameButton">新游戏</button>
+            <div class="button-container">
+                <button class="new-game-button" id="newGameButton">新游戏</button>
+                <button class="theme-toggle-button" id="themeToggleButton">🌙</button>
+            </div>
         </div>
         <div class="game-container" id="gameContainer">
             <div class="grid-container">
@@ -61,6 +64,7 @@
                 <p></p>
                 <div class="lower">
                     <button class="retry-button" id="retryButton">再来一局</button>
+                    <button class="continue-button" id="continueButton" style="display: none;">继续游戏</button>
                 </div>
             </div>
         </div>
