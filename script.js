@@ -10,6 +10,7 @@ class Game {
         this.gameMessage = document.getElementById('gameMessage');
         this.gameMessageText = this.gameMessage.querySelector('p');
         
+        this.bestScoreElement.textContent = this.bestScore;
         this.init();
         this.bindEvents();
     }
