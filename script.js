@@ -16,7 +16,11 @@ class Game {
         this.merges = [];
         
         this.bestScoreElement.textContent = this.bestScore;
-        this.init();
+        
+        if (!this.tryRestoreGame()) {
+            this.init();
+        }
+        
         this.bindEvents();
     }
     
@@ -32,6 +36,46 @@ class Game {
         this.clearTiles();
         this.addRandomTile();
         this.addRandomTile();
+        this.clearSavedGame();
+    }
+    
+    tryRestoreGame() {
+        const savedState = this.loadGameState();
+        if (!savedState) {
+            return false;
+        }
+        
+        try {
+            this.grid = savedState.grid;
+            this.score = savedState.score;
+            this.gameOver = savedState.gameOver;
+            this.history = savedState.history || [];
+            this.undoUsed = savedState.undoUsed || 0;
+            
+            this.updateScore();
+            this.updateUndoCount();
+            
+            if (this.gameOver) {
+                this.showGameMessage('游戏结束！');
+            } else {
+                this.hideGameMessage();
+            }
+            
+            this.clearTiles();
+            for (let row = 0; row < 4; row++) {
+                for (let col = 0; col < 4; col++) {
+                    if (this.grid[row][col] !== null) {
+                        this.createTile(row, col, this.grid[row][col]);
+                    }
+                }
+            }
+            
+            return true;
+        } catch (e) {
+            console.error('Failed to restore game state:', e);
+            this.clearSavedGame();
+            return false;
+        }
     }
     
     bindEvents() {
@@ -156,6 +200,7 @@ class Game {
             setTimeout(() => {
                 this.addRandomTile();
                 this.checkGameOver();
+                this.saveGameState();
             }, 150);
         }
     }
@@ -425,6 +470,37 @@ class Game {
         localStorage.setItem('bestScore', score);
     }
     
+    saveGameState() {
+        const gameState = {
+            grid: this.grid,
+            score: this.score,
+            gameOver: this.gameOver,
+            history: this.history,
+            undoUsed: this.undoUsed
+        };
+        localStorage.setItem('gameState', JSON.stringify(gameState));
+    }
+    
+    loadGameState() {
+        const savedState = localStorage.getItem('gameState');
+        if (savedState) {
+            try {
+                return JSON.parse(savedState);
+            } catch (e) {
+                return null;
+            }
+        }
+        return null;
+    }
+    
+    hasSavedGame() {
+        return localStorage.getItem('gameState') !== null;
+    }
+    
+    clearSavedGame() {
+        localStorage.removeItem('gameState');
+    }
+    
     undo() {
         if (this.undoUsed >= this.maxUndoCount || this.history.length === 0) {
             return false;
@@ -449,6 +525,7 @@ class Game {
             }
         }
         
+        this.saveGameState();
         return true;
     }
     
@@ -463,6 +540,7 @@ class Game {
         
         this.gameOver = true;
         this.showGameMessage('游戏结束！');
+        this.saveGameState();
     }
     
     hasEmptyCell() {
