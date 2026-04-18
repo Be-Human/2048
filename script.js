@@ -4,9 +4,13 @@ class Game {
         this.score = 0;
         this.bestScore = this.getBestScore();
         this.gameOver = false;
+        this.history = [];
+        this.maxUndoCount = 3;
+        this.undoCount = 0;
         this.tileContainer = document.getElementById('tileContainer');
         this.scoreElement = document.getElementById('score');
         this.bestScoreElement = document.getElementById('bestScore');
+        this.undoCountElement = document.getElementById('undoCount');
         this.gameMessage = document.getElementById('gameMessage');
         this.gameMessageText = this.gameMessage.querySelector('p');
         
@@ -19,7 +23,10 @@ class Game {
         this.grid = Array(4).fill(null).map(() => Array(4).fill(null));
         this.score = 0;
         this.gameOver = false;
+        this.history = [];
+        this.undoCount = 0;
         this.updateScore();
+        this.updateUndoCount();
         this.hideGameMessage();
         this.clearTiles();
         this.addRandomTile();
@@ -28,6 +35,12 @@ class Game {
     
     bindEvents() {
         document.addEventListener('keydown', (e) => {
+            if (e.key === 'z' || e.key === 'Z') {
+                e.preventDefault();
+                this.undo();
+                return;
+            }
+            
             if (this.gameOver) return;
             
             switch(e.key) {
@@ -107,6 +120,7 @@ class Game {
     
     move(direction) {
         const previousGrid = this.copyGrid(this.grid);
+        const previousScore = this.score;
         let moved = false;
         
         switch(direction) {
@@ -125,6 +139,19 @@ class Game {
         }
         
         if (moved) {
+            const historyItem = {
+                grid: previousGrid,
+                score: previousScore
+            };
+            
+            if (this.history.length >= this.maxUndoCount) {
+                this.history.shift();
+            }
+            
+            this.history.push(historyItem);
+            this.undoCount = 0;
+            this.updateUndoCount();
+            
             setTimeout(() => {
                 this.addRandomTile();
                 this.checkGameOver();
@@ -334,6 +361,13 @@ class Game {
         }
     }
     
+    updateUndoCount() {
+        const remaining = this.maxUndoCount - this.undoCount;
+        if (this.undoCountElement) {
+            this.undoCountElement.textContent = remaining;
+        }
+    }
+    
     getBestScore() {
         const bestScore = localStorage.getItem('bestScore');
         return bestScore ? parseInt(bestScore) : 0;
@@ -341,6 +375,33 @@ class Game {
     
     setBestScore(score) {
         localStorage.setItem('bestScore', score);
+    }
+    
+    undo() {
+        if (this.undoCount >= this.maxUndoCount || this.history.length === 0) {
+            return false;
+        }
+        
+        const previousState = this.history.pop();
+        this.grid = previousState.grid;
+        this.score = previousState.score;
+        this.undoCount++;
+        this.gameOver = false;
+        
+        this.updateScore();
+        this.updateUndoCount();
+        this.hideGameMessage();
+        
+        this.tileContainer.innerHTML = '';
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 4; col++) {
+                if (this.grid[row][col] !== null) {
+                    this.createTile(row, col, this.grid[row][col]);
+                }
+            }
+        }
+        
+        return true;
     }
     
     checkGameOver() {

@@ -38,7 +38,8 @@ body {
 }
 
 .score,
-.best-score {
+.best-score,
+.undo-count {
     background-color: #bbada0;
     border-radius: 3px;
     padding: 5px 20px;
