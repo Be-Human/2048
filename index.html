@@ -29,6 +29,7 @@
             <p>使用键盘方向键移动方块，相同数字的方块相碰时会合并成它们的和。</p>
             <div class="button-container">
                 <button class="new-game-button" id="newGameButton">新游戏</button>
+                <button class="leaderboard-button" id="leaderboardButton">排行榜</button>
                 <button class="theme-toggle-button" id="themeToggleButton">🌙</button>
             </div>
         </div>
@@ -66,6 +67,18 @@
                     <button class="retry-button" id="retryButton">再来一局</button>
                     <button class="continue-button" id="continueButton" style="display: none;">继续游戏</button>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="leaderboard-modal" id="leaderboardModal">
+        <div class="leaderboard-content">
+            <h2 class="leaderboard-title">排行榜</h2>
+            <div class="leaderboard-list" id="leaderboardList">
+                <p class="no-records">暂无记录</p>
+            </div>
+            <div class="leaderboard-buttons">
+                <button class="clear-leaderboard-button" id="clearLeaderboardButton">清空记录</button>
+                <button class="close-leaderboard-button" id="closeLeaderboardButton">关闭</button>
             </div>
         </div>
     </div>

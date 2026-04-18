@@ -116,6 +116,143 @@ body {
     background-color: #9f8b77;
 }
 
+.leaderboard-button {
+    background-color: #8f7a66;
+    color: #f9f6f2;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.leaderboard-button:hover {
+    background-color: #9f8b77;
+}
+
+.leaderboard-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.leaderboard-modal.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.leaderboard-content {
+    background-color: #faf8ef;
+    border-radius: 6px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.leaderboard-title {
+    font-size: 30px;
+    font-weight: bold;
+    color: #776e65;
+    margin: 0 0 20px 0;
+    text-align: center;
+}
+
+.leaderboard-list {
+    margin-bottom: 20px;
+}
+
+.no-records {
+    text-align: center;
+    color: #776e65;
+    font-size: 16px;
+    margin: 20px 0;
+}
+
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background-color: #bbada0;
+    border-radius: 3px;
+    color: #f9f6f2;
+    font-size: 16px;
+}
+
+.leaderboard-item:last-child {
+    margin-bottom: 0;
+}
+
+.leaderboard-rank {
+    font-weight: bold;
+    font-size: 18px;
+    min-width: 30px;
+}
+
+.leaderboard-score {
+    font-weight: bold;
+    font-size: 20px;
+    flex: 1;
+    text-align: center;
+}
+
+.leaderboard-date {
+    font-size: 14px;
+    color: #eee4da;
+    text-align: right;
+}
+
+.leaderboard-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.clear-leaderboard-button,
+.close-leaderboard-button {
+    background-color: #8f7a66;
+    color: #f9f6f2;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.clear-leaderboard-button:hover,
+.close-leaderboard-button:hover {
+    background-color: #9f8b77;
+}
+
+.clear-leaderboard-button {
+    background-color: #f65e3b;
+}
+
+.clear-leaderboard-button:hover {
+    background-color: #f67c5f;
+}
+
 .game-container {
     position: relative;
     background-color: #bbada0;
@@ -397,6 +534,56 @@ body {
     .game-message p {
         font-size: 35px;
     }
+    
+    .button-container {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .leaderboard-button,
+    .new-game-button,
+    .theme-toggle-button {
+        padding: 8px 15px;
+        font-size: 16px;
+    }
+    
+    .leaderboard-content {
+        padding: 20px;
+        width: 95%;
+    }
+    
+    .leaderboard-title {
+        font-size: 24px;
+    }
+    
+    .leaderboard-item {
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px;
+    }
+    
+    .leaderboard-rank {
+        font-size: 16px;
+    }
+    
+    .leaderboard-score {
+        font-size: 18px;
+    }
+    
+    .leaderboard-date {
+        font-size: 12px;
+    }
+    
+    .leaderboard-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .clear-leaderboard-button,
+    .close-leaderboard-button {
+        width: 100%;
+        padding: 10px;
+    }
 }
 
 body.dark-mode {
@@ -517,4 +704,49 @@ body.dark-mode .game-message {
 
 body.dark-mode .game-message p {
     color: #f9f6f2;
+}
+
+body.dark-mode .leaderboard-button {
+    background-color: #00adb5;
+}
+
+body.dark-mode .leaderboard-button:hover {
+    background-color: #00b8c1;
+}
+
+body.dark-mode .leaderboard-content {
+    background-color: #222831;
+}
+
+body.dark-mode .leaderboard-title {
+    color: #f9f6f2;
+}
+
+body.dark-mode .no-records {
+    color: #f9f6f2;
+}
+
+body.dark-mode .leaderboard-item {
+    background-color: #393e46;
+    color: #f9f6f2;
+}
+
+body.dark-mode .leaderboard-date {
+    color: #eee4da;
+}
+
+body.dark-mode .close-leaderboard-button {
+    background-color: #00adb5;
+}
+
+body.dark-mode .close-leaderboard-button:hover {
+    background-color: #00b8c1;
+}
+
+body.dark-mode .clear-leaderboard-button {
+    background-color: #f65e3b;
+}
+
+body.dark-mode .clear-leaderboard-button:hover {
+    background-color: #f67c5f;
 }

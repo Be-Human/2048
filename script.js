@@ -17,6 +17,8 @@ class Game {
         this.gameMessageText = this.gameMessage.querySelector('p');
         this.continueButton = document.getElementById('continueButton');
         this.merges = [];
+        this.leaderboardModal = document.getElementById('leaderboardModal');
+        this.leaderboardList = document.getElementById('leaderboardList');
         
         this.bestScoreElement.textContent = this.bestScore;
         this.initTheme();
@@ -145,6 +147,35 @@ class Game {
         if (themeToggleButton) {
             themeToggleButton.addEventListener('click', () => {
                 this.toggleTheme();
+            });
+        }
+        
+        const leaderboardButton = document.getElementById('leaderboardButton');
+        if (leaderboardButton) {
+            leaderboardButton.addEventListener('click', () => {
+                this.showLeaderboard();
+            });
+        }
+        
+        const closeLeaderboardButton = document.getElementById('closeLeaderboardButton');
+        if (closeLeaderboardButton) {
+            closeLeaderboardButton.addEventListener('click', () => {
+                this.hideLeaderboard();
+            });
+        }
+        
+        const clearLeaderboardButton = document.getElementById('clearLeaderboardButton');
+        if (clearLeaderboardButton) {
+            clearLeaderboardButton.addEventListener('click', () => {
+                this.clearLeaderboard();
+            });
+        }
+        
+        if (this.leaderboardModal) {
+            this.leaderboardModal.addEventListener('click', (e) => {
+                if (e.target === this.leaderboardModal) {
+                    this.hideLeaderboard();
+                }
             });
         }
     }
@@ -596,6 +627,7 @@ class Game {
         }
         
         this.gameOver = true;
+        this.saveToLeaderboard(this.score);
         this.showGameMessage('游戏结束！');
         this.saveGameState();
     }
@@ -672,6 +704,104 @@ class Game {
             }
             localStorage.setItem('theme', 'dark');
         }
+    }
+    
+    getLeaderboard() {
+        const leaderboard = localStorage.getItem('leaderboard');
+        if (leaderboard) {
+            try {
+                return JSON.parse(leaderboard);
+            } catch (e) {
+                return [];
+            }
+        }
+        return [];
+    }
+    
+    saveToLeaderboard(score) {
+        if (score <= 0) {
+            return;
+        }
+        
+        const leaderboard = this.getLeaderboard();
+        const now = new Date();
+        const dateStr = this.formatDate(now);
+        
+        const newRecord = {
+            score: score,
+            date: dateStr,
+            timestamp: now.getTime()
+        };
+        
+        leaderboard.push(newRecord);
+        
+        leaderboard.sort((a, b) => {
+            if (b.score !== a.score) {
+                return b.score - a.score;
+            }
+            return b.timestamp - a.timestamp;
+        });
+        
+        const top5 = leaderboard.slice(0, 5);
+        
+        localStorage.setItem('leaderboard', JSON.stringify(top5));
+    }
+    
+    formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+    
+    clearLeaderboard() {
+        if (confirm('确定要清空所有排行榜记录吗？')) {
+            localStorage.removeItem('leaderboard');
+            this.renderLeaderboard();
+        }
+    }
+    
+    showLeaderboard() {
+        this.renderLeaderboard();
+        if (this.leaderboardModal) {
+            this.leaderboardModal.classList.add('show');
+        }
+    }
+    
+    hideLeaderboard() {
+        if (this.leaderboardModal) {
+            this.leaderboardModal.classList.remove('show');
+        }
+    }
+    
+    renderLeaderboard() {
+        if (!this.leaderboardList) {
+            return;
+        }
+        
+        const leaderboard = this.getLeaderboard();
+        
+        if (leaderboard.length === 0) {
+            this.leaderboardList.innerHTML = '<p class="no-records">暂无记录</p>';
+            return;
+        }
+        
+        let html = '';
+        leaderboard.forEach((record, index) => {
+            const rank = index + 1;
+            html += `
+                <div class="leaderboard-item">
+                    <span class="leaderboard-rank">#${rank}</span>
+                    <span class="leaderboard-score">${record.score}</span>
+                    <span class="leaderboard-date">${record.date}</span>
+                </div>
+            `;
+        });
+        
+        this.leaderboardList.innerHTML = html;
     }
 }
 
