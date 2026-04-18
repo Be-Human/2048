@@ -6,7 +6,6 @@ class Game {
         this.gameOver = false;
         this.history = [];
         this.maxUndoCount = 3;
-        this.undoCount = 0;
         this.tileContainer = document.getElementById('tileContainer');
         this.scoreElement = document.getElementById('score');
         this.bestScoreElement = document.getElementById('bestScore');
@@ -24,7 +23,6 @@ class Game {
         this.score = 0;
         this.gameOver = false;
         this.history = [];
-        this.undoCount = 0;
         this.updateScore();
         this.updateUndoCount();
         this.hideGameMessage();
@@ -149,7 +147,6 @@ class Game {
             }
             
             this.history.push(historyItem);
-            this.undoCount = 0;
             this.updateUndoCount();
             
             setTimeout(() => {
@@ -362,9 +359,8 @@ class Game {
     }
     
     updateUndoCount() {
-        const remaining = this.maxUndoCount - this.undoCount;
         if (this.undoCountElement) {
-            this.undoCountElement.textContent = remaining;
+            this.undoCountElement.textContent = this.history.length;
         }
     }
     
@@ -378,14 +374,13 @@ class Game {
     }
     
     undo() {
-        if (this.undoCount >= this.maxUndoCount || this.history.length === 0) {
+        if (this.history.length === 0) {
             return false;
         }
         
         const previousState = this.history.pop();
         this.grid = previousState.grid;
         this.score = previousState.score;
-        this.undoCount++;
         this.gameOver = false;
         
         this.updateScore();
