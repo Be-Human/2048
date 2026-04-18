@@ -65,6 +65,8 @@ class Game {
             
             if (this.gameOver) {
                 this.showGameMessage('游戏结束！');
+            } else if (this.won && !this.keepPlaying) {
+                this.showWinMessage();
             } else {
                 this.hideGameMessage();
             }
@@ -94,7 +96,7 @@ class Game {
                 return;
             }
             
-            if (this.gameOver) return;
+            if (this.gameOver || (this.won && !this.keepPlaying)) return;
             
             switch(e.key) {
                 case 'ArrowUp':
