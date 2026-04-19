@@ -39,7 +39,9 @@ body {
 
 .score,
 .best-score,
-.undo-count {
+.undo-count,
+.moves-count,
+.time-count {
     background-color: #bbada0;
     border-radius: 3px;
     padding: 5px 20px;
@@ -478,7 +480,9 @@ body {
     
     .score,
     .best-score,
-    .undo-count {
+    .undo-count,
+    .moves-count,
+    .time-count {
         padding: 5px 10px;
         min-width: 60px;
     }
@@ -600,7 +604,9 @@ body.dark-mode .game-intro {
 
 body.dark-mode .score,
 body.dark-mode .best-score,
-body.dark-mode .undo-count {
+body.dark-mode .undo-count,
+body.dark-mode .moves-count,
+body.dark-mode .time-count {
     background-color: #393e46;
 }
 

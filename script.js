@@ -9,10 +9,16 @@ class Game {
         this.history = [];
         this.maxUndoCount = 3;
         this.undoUsed = 0;
+        this.moves = 0;
+        this.time = 0;
+        this.timer = null;
+        this.startTime = null;
         this.tileContainer = document.getElementById('tileContainer');
         this.scoreElement = document.getElementById('score');
         this.bestScoreElement = document.getElementById('bestScore');
         this.undoCountElement = document.getElementById('undoCount');
+        this.movesCountElement = document.getElementById('movesCount');
+        this.timeCountElement = document.getElementById('timeCount');
         this.gameMessage = document.getElementById('gameMessage');
         this.gameMessageText = this.gameMessage.querySelector('p');
         this.continueButton = document.getElementById('continueButton');
@@ -34,6 +40,7 @@ class Game {
         if (this.gameOver === false && this.score > 0) {
             this.saveToLeaderboard(this.score);
         }
+        this.stopTimer();
         this.grid = Array(4).fill(null).map(() => Array(4).fill(null));
         this.score = 0;
         this.gameOver = false;
@@ -41,8 +48,13 @@ class Game {
         this.keepPlaying = false;
         this.history = [];
         this.undoUsed = 0;
+        this.moves = 0;
+        this.time = 0;
+        this.startTime = null;
         this.updateScore();
         this.updateUndoCount();
+        this.updateMovesCount();
+        this.updateTimeDisplay();
         this.hideGameMessage();
         this.clearTiles();
         this.addRandomTile();
@@ -64,9 +76,14 @@ class Game {
             this.keepPlaying = savedState.keepPlaying || false;
             this.history = savedState.history || [];
             this.undoUsed = savedState.undoUsed || 0;
+            this.moves = savedState.moves || 0;
+            this.time = savedState.time || 0;
+            this.startTime = savedState.startTime || null;
             
             this.updateScore();
             this.updateUndoCount();
+            this.updateMovesCount();
+            this.updateTimeDisplay();
             
             if (this.gameOver) {
                 this.showGameMessage('游戏结束！');
@@ -74,6 +91,10 @@ class Game {
                 this.showWinMessage();
             } else {
                 this.hideGameMessage();
+            }
+            
+            if (this.startTime && !this.gameOver && !(this.won && !this.keepPlaying)) {
+                this.resumeTimer();
             }
             
             this.clearTiles();
@@ -142,6 +163,9 @@ class Game {
             continueButton.addEventListener('click', () => {
                 this.keepPlaying = true;
                 this.hideGameMessage();
+                if (this.moves > 0) {
+                    this.resumeTimer();
+                }
                 this.saveGameState();
             });
         }
@@ -235,6 +259,13 @@ class Game {
         const moved = this.moveTiles(direction);
         
         if (moved) {
+            this.moves++;
+            this.updateMovesCount();
+            
+            if (this.moves === 1 && !this.timer) {
+                this.startTimer();
+            }
+            
             const historyItem = {
                 grid: previousGrid,
                 score: previousScore
@@ -410,6 +441,49 @@ class Game {
         }
     }
     
+    updateMovesCount() {
+        if (this.movesCountElement) {
+            this.movesCountElement.textContent = this.moves;
+        }
+    }
+    
+    updateTimeDisplay() {
+        if (this.timeCountElement) {
+            const minutes = Math.floor(this.time / 60);
+            const seconds = this.time % 60;
+            this.timeCountElement.textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+    }
+    
+    startTimer() {
+        if (this.timer) {
+            return;
+        }
+        this.startTime = Date.now();
+        this.timer = setInterval(() => {
+            this.time++;
+            this.updateTimeDisplay();
+        }, 1000);
+    }
+    
+    stopTimer() {
+        if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+        }
+    }
+    
+    resumeTimer() {
+        if (this.timer) {
+            return;
+        }
+        this.timer = setInterval(() => {
+            this.time++;
+            this.updateTimeDisplay();
+        }, 1000);
+    }
+    
     getBestScore() {
         const bestScore = localStorage.getItem('bestScore');
         return bestScore ? parseInt(bestScore) : 0;
@@ -427,7 +501,10 @@ class Game {
             won: this.won,
             keepPlaying: this.keepPlaying,
             history: this.history,
-            undoUsed: this.undoUsed
+            undoUsed: this.undoUsed,
+            moves: this.moves,
+            time: this.time,
+            startTime: this.startTime
         };
         localStorage.setItem('gameState', JSON.stringify(gameState));
     }
@@ -497,6 +574,7 @@ class Game {
     }
     
     showWinMessage() {
+        this.stopTimer();
         this.gameMessageText.textContent = '你赢了！';
         this.continueButton.style.display = 'inline-block';
         this.gameMessage.classList.add('show');
@@ -516,6 +594,7 @@ class Game {
         }
         
         this.gameOver = true;
+        this.stopTimer();
         this.saveToLeaderboard(this.score);
         this.showGameMessage('游戏结束！');
         this.saveGameState();
