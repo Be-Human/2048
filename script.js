@@ -31,6 +31,9 @@ class Game {
     }
     
     init() {
+        if (!this.gameOver && this.score > 0) {
+            this.saveToLeaderboard(this.score);
+        }
         this.grid = Array(4).fill(null).map(() => Array(4).fill(null));
         this.score = 0;
         this.gameOver = false;
