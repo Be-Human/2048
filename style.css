@@ -564,10 +564,11 @@ body {
 
 .rank-message {
     display: none;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
     color: #edc22e;
-    margin: 0 0 20px 0;
+    margin: 5px 0 20px 0;
+    white-space: nowrap;
 }
 
 .game-message .lower {
@@ -669,7 +670,8 @@ body {
     }
     
     .rank-message {
-        font-size: 20px;
+        font-size: 18px;
+        white-space: nowrap;
     }
     
     .button-container {
@@ -862,6 +864,10 @@ body.dark-mode .game-message {
 
 body.dark-mode .game-message p {
     color: #f9f6f2;
+}
+
+body.dark-mode .rank-message {
+    color: #ffd700;
 }
 
 body.dark-mode .leaderboard-button {
