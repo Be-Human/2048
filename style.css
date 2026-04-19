@@ -548,6 +548,7 @@ body {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s;
+    padding: 20px;
 }
 
 .game-message.show {
@@ -556,19 +557,26 @@ body {
 }
 
 .game-message p {
-    font-size: 60px;
+    font-size: 40px;
     font-weight: bold;
     color: #776e65;
-    margin: 0 0 10px 0;
+    margin: 0 0 8px 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .rank-message {
     display: none;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: bold;
     color: #edc22e;
-    margin: 5px 0 20px 0;
+    margin: 0 0 15px 0;
     white-space: nowrap;
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .game-message .lower {
@@ -665,13 +673,18 @@ body {
         font-size: 15px;
     }
     
+    .game-message {
+        padding: 15px;
+    }
+    
     .game-message p {
-        font-size: 35px;
+        font-size: 28px;
     }
     
     .rank-message {
-        font-size: 18px;
+        font-size: 14px;
         white-space: nowrap;
+        padding: 6px 15px;
     }
     
     .button-container {
@@ -868,6 +881,7 @@ body.dark-mode .game-message p {
 
 body.dark-mode .rank-message {
     color: #ffd700;
+    background: rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .leaderboard-button {
