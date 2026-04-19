@@ -20,7 +20,8 @@ class Game {
         this.movesCountElement = document.getElementById('movesCount');
         this.timeCountElement = document.getElementById('timeCount');
         this.gameMessage = document.getElementById('gameMessage');
-        this.gameMessageText = this.gameMessage.querySelector('p');
+        this.gameMessageText = this.gameMessage.querySelector('p:first-of-type');
+        this.rankMessage = document.getElementById('rankMessage');
         this.continueButton = document.getElementById('continueButton');
         this.merges = [];
         this.leaderboardModal = document.getElementById('leaderboardModal');
@@ -595,8 +596,8 @@ class Game {
         
         this.gameOver = true;
         this.stopTimer();
-        this.saveToLeaderboard(this.score);
-        this.showGameMessage('游戏结束！');
+        const rank = this.saveToLeaderboard(this.score);
+        this.showGameMessage('游戏结束！', rank);
         this.saveGameState();
     }
     
@@ -628,14 +629,33 @@ class Game {
         return false;
     }
     
-    showGameMessage(message) {
+    showGameMessage(message, rank = null) {
         this.gameMessageText.textContent = message;
         this.continueButton.style.display = 'none';
+        
+        if (rank && this.rankMessage) {
+            const rankEmoji = this.getRankEmoji(rank);
+            this.rankMessage.textContent = `本局排名：${rankEmoji} 第${rank}名`;
+            this.rankMessage.style.display = 'block';
+        } else if (this.rankMessage) {
+            this.rankMessage.style.display = 'none';
+        }
+        
         this.gameMessage.classList.add('show');
+    }
+    
+    getRankEmoji(rank) {
+        if (rank === 1) return '🥇';
+        if (rank === 2) return '🥈';
+        if (rank === 3) return '🥉';
+        return `#${rank}`;
     }
     
     hideGameMessage() {
         this.gameMessage.classList.remove('show');
+        if (this.rankMessage) {
+            this.rankMessage.style.display = 'none';
+        }
     }
     
     initTheme() {
@@ -688,7 +708,7 @@ class Game {
     
     saveToLeaderboard(score) {
         if (score <= 0) {
-            return;
+            return null;
         }
         
         const leaderboard = this.getLeaderboard();
@@ -715,6 +735,9 @@ class Game {
         const top5 = leaderboard.slice(0, 5);
         
         localStorage.setItem('leaderboard', JSON.stringify(top5));
+        
+        const rank = top5.findIndex(record => record.timestamp === newRecord.timestamp);
+        return rank !== -1 ? rank + 1 : null;
     }
     
     formatDate(date) {
@@ -771,13 +794,15 @@ class Game {
         let html = '';
         leaderboard.forEach((record, index) => {
             const rank = index + 1;
+            const rankEmoji = this.getRankEmoji(rank);
+            const rankClass = `rank-${rank}`;
             const moves = record.moves !== undefined ? record.moves : '-';
             const time = this.formatTimeForDisplay(record.time);
             
             html += `
-                <div class="leaderboard-item">
+                <div class="leaderboard-item ${rankClass}">
                     <div class="leaderboard-header">
-                        <span class="leaderboard-rank">#${rank}</span>
+                        <span class="leaderboard-rank">${rankEmoji}</span>
                         <span class="leaderboard-score">${record.score}</span>
                         <span class="leaderboard-date">${record.date}</span>
                     </div>

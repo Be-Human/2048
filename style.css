@@ -271,6 +271,54 @@ body {
     text-align: right;
 }
 
+.leaderboard-item.rank-1 {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+    border: 2px solid #daa520;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.leaderboard-item.rank-1 .leaderboard-score,
+.leaderboard-item.rank-1 .leaderboard-rank {
+    color: #776e65;
+}
+
+.leaderboard-item.rank-1 .leaderboard-date,
+.leaderboard-item.rank-1 .leaderboard-details {
+    color: #8b7355;
+}
+
+.leaderboard-item.rank-2 {
+    background: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 100%);
+    border: 2px solid #a8a8a8;
+    box-shadow: 0 4px 15px rgba(192, 192, 192, 0.4);
+}
+
+.leaderboard-item.rank-2 .leaderboard-score,
+.leaderboard-item.rank-2 .leaderboard-rank {
+    color: #5a5a5a;
+}
+
+.leaderboard-item.rank-2 .leaderboard-date,
+.leaderboard-item.rank-2 .leaderboard-details {
+    color: #6a6a6a;
+}
+
+.leaderboard-item.rank-3 {
+    background: linear-gradient(135deg, #cd7f32 0%, #b87333 100%);
+    border: 2px solid #8b4513;
+    box-shadow: 0 4px 15px rgba(205, 127, 50, 0.4);
+}
+
+.leaderboard-item.rank-3 .leaderboard-score,
+.leaderboard-item.rank-3 .leaderboard-rank {
+    color: #fff8dc;
+}
+
+.leaderboard-item.rank-3 .leaderboard-date,
+.leaderboard-item.rank-3 .leaderboard-details {
+    color: #ffefd5;
+}
+
 .leaderboard-buttons {
     display: flex;
     justify-content: center;
@@ -511,6 +559,14 @@ body {
     font-size: 60px;
     font-weight: bold;
     color: #776e65;
+    margin: 0 0 10px 0;
+}
+
+.rank-message {
+    display: none;
+    font-size: 28px;
+    font-weight: bold;
+    color: #edc22e;
     margin: 0 0 20px 0;
 }
 
@@ -610,6 +666,10 @@ body {
     
     .game-message p {
         font-size: 35px;
+    }
+    
+    .rank-message {
+        font-size: 20px;
     }
     
     .button-container {
@@ -827,6 +887,51 @@ body.dark-mode .no-records {
 body.dark-mode .leaderboard-item {
     background-color: #393e46;
     color: #f9f6f2;
+}
+
+body.dark-mode .leaderboard-item.rank-1 {
+    background: linear-gradient(135deg, #b8860b 0%, #8b6914 100%);
+    border: 2px solid #daa520;
+}
+
+body.dark-mode .leaderboard-item.rank-1 .leaderboard-score,
+body.dark-mode .leaderboard-item.rank-1 .leaderboard-rank {
+    color: #fff8dc;
+}
+
+body.dark-mode .leaderboard-item.rank-1 .leaderboard-date,
+body.dark-mode .leaderboard-item.rank-1 .leaderboard-details {
+    color: #ffefd5;
+}
+
+body.dark-mode .leaderboard-item.rank-2 {
+    background: linear-gradient(135deg, #708090 0%, #4a5568 100%);
+    border: 2px solid #a8a8a8;
+}
+
+body.dark-mode .leaderboard-item.rank-2 .leaderboard-score,
+body.dark-mode .leaderboard-item.rank-2 .leaderboard-rank {
+    color: #f5f5f5;
+}
+
+body.dark-mode .leaderboard-item.rank-2 .leaderboard-date,
+body.dark-mode .leaderboard-item.rank-2 .leaderboard-details {
+    color: #dcdcdc;
+}
+
+body.dark-mode .leaderboard-item.rank-3 {
+    background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
+    border: 2px solid #cd7f32;
+}
+
+body.dark-mode .leaderboard-item.rank-3 .leaderboard-score,
+body.dark-mode .leaderboard-item.rank-3 .leaderboard-rank {
+    color: #fff8dc;
+}
+
+body.dark-mode .leaderboard-item.rank-3 .leaderboard-date,
+body.dark-mode .leaderboard-item.rank-3 .leaderboard-details {
+    color: #ffefd5;
 }
 
 body.dark-mode .leaderboard-date {
