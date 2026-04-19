@@ -31,7 +31,7 @@ class Game {
     }
     
     init() {
-        if (!this.gameOver && this.score > 0) {
+        if (this.gameOver === false && this.score > 0) {
             this.saveToLeaderboard(this.score);
         }
         this.grid = Array(4).fill(null).map(() => Array(4).fill(null));
@@ -621,6 +621,10 @@ class Game {
     }
     
     checkGameOver() {
+        if (this.gameOver) {
+            return;
+        }
+        
         if (this.hasEmptyCell()) {
             return;
         }
