@@ -232,22 +232,7 @@ class Game {
     move(direction) {
         const previousGrid = this.copyGrid(this.grid);
         const previousScore = this.score;
-        let moved = false;
-        
-        switch(direction) {
-            case 'up':
-                moved = this.moveUp();
-                break;
-            case 'down':
-                moved = this.moveDown();
-                break;
-            case 'left':
-                moved = this.moveLeft();
-                break;
-            case 'right':
-                moved = this.moveRight();
-                break;
-        }
+        const moved = this.moveTiles(direction);
         
         if (moved) {
             const historyItem = {
@@ -276,192 +261,87 @@ class Game {
         return grid.map(row => [...row]);
     }
     
-    moveLeft() {
-        let moved = false;
+    moveTiles(direction) {
         const previousGrid = this.copyGrid(this.grid);
         this.merges = [];
         
-        for (let row = 0; row < 4; row++) {
-            let currentRow = this.grid[row].filter(cell => cell !== null);
-            let newRow = [];
-            let newCol = 0;
+        const config = {
+            left: { isRow: true, reverse: false, fillEnd: true },
+            right: { isRow: true, reverse: true, fillEnd: false },
+            up: { isRow: false, reverse: false, fillEnd: true },
+            down: { isRow: false, reverse: true, fillEnd: false }
+        }[direction];
+        
+        for (let i = 0; i < 4; i++) {
+            let currentLine = [];
             
-            for (let i = 0; i < currentRow.length; i++) {
-                if (currentRow[i] === currentRow[i + 1]) {
-                    const mergedValue = currentRow[i] * 2;
-                    newRow.push(mergedValue);
-                    this.score += mergedValue;
-                    this.merges.push({ row, col: newCol, value: mergedValue });
-                    newCol++;
-                    i++;
-                } else {
-                    newRow.push(currentRow[i]);
-                    newCol++;
+            for (let j = 0; j < 4; j++) {
+                const value = config.isRow ? this.grid[i][j] : this.grid[j][i];
+                if (value !== null) {
+                    currentLine.push(value);
                 }
             }
             
-            while (newRow.length < 4) {
-                newRow.push(null);
-            }
-            
-            this.grid[row] = newRow;
-        }
-        
-        this.updateScore();
-        moved = this.hasGridChanged(previousGrid);
-        
-        if (moved) {
-            this.animateTiles(previousGrid, 'left');
-            this.showMergeAnimations();
-        }
-        
-        return moved;
-    }
-    
-    moveRight() {
-        let moved = false;
-        const previousGrid = this.copyGrid(this.grid);
-        this.merges = [];
-        
-        for (let row = 0; row < 4; row++) {
-            let currentRow = this.grid[row].filter(cell => cell !== null);
-            let newRow = [];
+            let newLine = [];
             let mergePositions = [];
             
-            for (let i = currentRow.length - 1; i >= 0; i--) {
-                if (currentRow[i] === currentRow[i - 1]) {
-                    const mergedValue = currentRow[i] * 2;
-                    newRow.unshift(mergedValue);
-                    this.score += mergedValue;
-                    mergePositions.unshift(newRow.length - 1);
-                    i--;
+            if (config.reverse) {
+                for (let j = currentLine.length - 1; j >= 0; j--) {
+                    if (currentLine[j] === currentLine[j - 1]) {
+                        const mergedValue = currentLine[j] * 2;
+                        newLine.unshift(mergedValue);
+                        this.score += mergedValue;
+                        mergePositions.unshift(newLine.length - 1);
+                        j--;
+                    } else {
+                        newLine.unshift(currentLine[j]);
+                    }
+                }
+            } else {
+                for (let j = 0; j < currentLine.length; j++) {
+                    if (currentLine[j] === currentLine[j + 1]) {
+                        const mergedValue = currentLine[j] * 2;
+                        newLine.push(mergedValue);
+                        this.score += mergedValue;
+                        mergePositions.push(newLine.length - 1);
+                        j++;
+                    } else {
+                        newLine.push(currentLine[j]);
+                    }
+                }
+            }
+            
+            while (newLine.length < 4) {
+                if (config.fillEnd) {
+                    newLine.push(null);
                 } else {
-                    newRow.unshift(currentRow[i]);
+                    newLine.unshift(null);
+                    mergePositions = mergePositions.map(p => p + 1);
                 }
             }
             
-            while (newRow.length < 4) {
-                newRow.unshift(null);
-                mergePositions = mergePositions.map(p => p + 1);
-            }
-            
-            this.grid[row] = newRow;
-            
-            for (const pos of mergePositions) {
-                this.merges.push({ row, col: pos, value: newRow[pos] });
-            }
-        }
-        
-        this.updateScore();
-        moved = this.hasGridChanged(previousGrid);
-        
-        if (moved) {
-            this.animateTiles(previousGrid, 'right');
-            this.showMergeAnimations();
-        }
-        
-        return moved;
-    }
-    
-    moveUp() {
-        let moved = false;
-        const previousGrid = this.copyGrid(this.grid);
-        this.merges = [];
-        
-        for (let col = 0; col < 4; col++) {
-            let currentCol = [];
-            
-            for (let row = 0; row < 4; row++) {
-                if (this.grid[row][col] !== null) {
-                    currentCol.push(this.grid[row][col]);
-                }
-            }
-            
-            let newCol = [];
-            let mergePositions = [];
-            for (let i = 0; i < currentCol.length; i++) {
-                if (currentCol[i] === currentCol[i + 1]) {
-                    const mergedValue = currentCol[i] * 2;
-                    newCol.push(mergedValue);
-                    this.score += mergedValue;
-                    mergePositions.push(newCol.length - 1);
-                    i++;
+            for (let j = 0; j < 4; j++) {
+                if (config.isRow) {
+                    this.grid[i][j] = newLine[j];
                 } else {
-                    newCol.push(currentCol[i]);
+                    this.grid[j][i] = newLine[j];
                 }
-            }
-            
-            while (newCol.length < 4) {
-                newCol.push(null);
-            }
-            
-            for (let row = 0; row < 4; row++) {
-                this.grid[row][col] = newCol[row];
             }
             
             for (const pos of mergePositions) {
-                this.merges.push({ row: pos, col, value: newCol[pos] });
-            }
-        }
-        
-        this.updateScore();
-        moved = this.hasGridChanged(previousGrid);
-        
-        if (moved) {
-            this.animateTiles(previousGrid, 'up');
-            this.showMergeAnimations();
-        }
-        
-        return moved;
-    }
-    
-    moveDown() {
-        let moved = false;
-        const previousGrid = this.copyGrid(this.grid);
-        this.merges = [];
-        
-        for (let col = 0; col < 4; col++) {
-            let currentCol = [];
-            
-            for (let row = 0; row < 4; row++) {
-                if (this.grid[row][col] !== null) {
-                    currentCol.push(this.grid[row][col]);
-                }
-            }
-            
-            let newCol = [];
-            let mergePositions = [];
-            for (let i = currentCol.length - 1; i >= 0; i--) {
-                if (currentCol[i] === currentCol[i - 1]) {
-                    const mergedValue = currentCol[i] * 2;
-                    newCol.unshift(mergedValue);
-                    this.score += mergedValue;
-                    mergePositions.unshift(newCol.length - 1);
-                    i--;
+                if (config.isRow) {
+                    this.merges.push({ row: i, col: pos, value: newLine[pos] });
                 } else {
-                    newCol.unshift(currentCol[i]);
+                    this.merges.push({ row: pos, col: i, value: newLine[pos] });
                 }
-            }
-            
-            while (newCol.length < 4) {
-                newCol.unshift(null);
-                mergePositions = mergePositions.map(p => p + 1);
-            }
-            
-            for (let row = 0; row < 4; row++) {
-                this.grid[row][col] = newCol[row];
-            }
-            
-            for (const pos of mergePositions) {
-                this.merges.push({ row: pos, col, value: newCol[pos] });
             }
         }
         
         this.updateScore();
-        moved = this.hasGridChanged(previousGrid);
+        const moved = this.hasGridChanged(previousGrid);
         
         if (moved) {
-            this.animateTiles(previousGrid, 'down');
+            this.animateTiles(previousGrid, direction);
             this.showMergeAnimations();
         }
         
