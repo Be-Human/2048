@@ -216,8 +216,7 @@ body {
 
 .leaderboard-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     padding: 12px 15px;
     margin-bottom: 8px;
     background-color: #bbada0;
@@ -228,6 +227,21 @@ body {
 
 .leaderboard-item:last-child {
     margin-bottom: 0;
+}
+
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.leaderboard-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #eee4da;
 }
 
 .leaderboard-rank {
@@ -246,6 +260,14 @@ body {
 .leaderboard-date {
     font-size: 14px;
     color: #eee4da;
+    text-align: right;
+}
+
+.leaderboard-moves {
+    margin-right: 20px;
+}
+
+.leaderboard-time {
     text-align: right;
 }
 
@@ -617,16 +639,35 @@ body {
         padding: 10px;
     }
     
+    .leaderboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .leaderboard-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
     .leaderboard-rank {
         font-size: 16px;
     }
     
     .leaderboard-score {
         font-size: 18px;
+        text-align: left;
+        flex: none;
     }
     
     .leaderboard-date {
         font-size: 12px;
+        text-align: left;
+    }
+    
+    .leaderboard-moves {
+        margin-right: 0;
     }
     
     .leaderboard-buttons {
