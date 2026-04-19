@@ -34,6 +34,13 @@ body {
 
 .score-container {
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.main-scores,
+.stats-row {
+    display: flex;
     gap: 10px;
 }
 
@@ -49,6 +56,13 @@ body {
     min-width: 80px;
 }
 
+.undo-count,
+.moves-count,
+.time-count {
+    padding: 4px 15px;
+    min-width: 70px;
+}
+
 .score-label {
     font-size: 13px;
     color: #eee4da;
@@ -56,10 +70,22 @@ body {
     font-weight: bold;
 }
 
+.undo-count .score-label,
+.moves-count .score-label,
+.time-count .score-label {
+    font-size: 12px;
+}
+
 .score-value {
     font-size: 25px;
     color: white;
     font-weight: bold;
+}
+
+.undo-count .score-value,
+.moves-count .score-value,
+.time-count .score-value {
+    font-size: 20px;
 }
 
 .game-intro {
@@ -478,17 +504,42 @@ body {
         font-size: 50px;
     }
     
+    .score-container {
+        gap: 6px;
+    }
+    
+    .main-scores,
+    .stats-row {
+        gap: 6px;
+    }
+    
     .score,
-    .best-score,
+    .best-score {
+        padding: 4px 10px;
+        min-width: 60px;
+    }
+    
     .undo-count,
     .moves-count,
     .time-count {
-        padding: 5px 10px;
-        min-width: 60px;
+        padding: 3px 8px;
+        min-width: 50px;
     }
     
     .score-value {
         font-size: 18px;
+    }
+    
+    .undo-count .score-value,
+    .moves-count .score-value,
+    .time-count .score-value {
+        font-size: 16px;
+    }
+    
+    .undo-count .score-label,
+    .moves-count .score-label,
+    .time-count .score-label {
+        font-size: 10px;
     }
     
     .game-intro {
