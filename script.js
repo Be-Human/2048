@@ -295,6 +295,7 @@ class Game {
                         this.score += mergedValue;
                         j--;
                     } else {
+                        mergePositions = mergePositions.map(p => p + 1);
                         newLine.unshift(currentLine[j]);
                     }
                 }
