@@ -697,6 +697,8 @@ class Game {
         
         const newRecord = {
             score: score,
+            moves: this.moves,
+            time: this.time,
             date: dateStr,
             timestamp: now.getTime()
         };
@@ -745,6 +747,15 @@ class Game {
         }
     }
     
+    formatTimeForDisplay(seconds) {
+        if (seconds === undefined || seconds === null) {
+            return '-';
+        }
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+    
     renderLeaderboard() {
         if (!this.leaderboardList) {
             return;
@@ -760,11 +771,20 @@ class Game {
         let html = '';
         leaderboard.forEach((record, index) => {
             const rank = index + 1;
+            const moves = record.moves !== undefined ? record.moves : '-';
+            const time = this.formatTimeForDisplay(record.time);
+            
             html += `
                 <div class="leaderboard-item">
-                    <span class="leaderboard-rank">#${rank}</span>
-                    <span class="leaderboard-score">${record.score}</span>
-                    <span class="leaderboard-date">${record.date}</span>
+                    <div class="leaderboard-header">
+                        <span class="leaderboard-rank">#${rank}</span>
+                        <span class="leaderboard-score">${record.score}</span>
+                        <span class="leaderboard-date">${record.date}</span>
+                    </div>
+                    <div class="leaderboard-details">
+                        <span class="leaderboard-moves">步数: ${moves}</span>
+                        <span class="leaderboard-time">时间: ${time}</span>
+                    </div>
                 </div>
             `;
         });
