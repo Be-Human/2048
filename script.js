@@ -289,9 +289,10 @@ class Game {
                 for (let j = currentLine.length - 1; j >= 0; j--) {
                     if (currentLine[j] === currentLine[j - 1]) {
                         const mergedValue = currentLine[j] * 2;
+                        mergePositions = mergePositions.map(p => p + 1);
+                        mergePositions.unshift(0);
                         newLine.unshift(mergedValue);
                         this.score += mergedValue;
-                        mergePositions.unshift(newLine.length - 1);
                         j--;
                     } else {
                         newLine.unshift(currentLine[j]);
