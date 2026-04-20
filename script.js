@@ -266,7 +266,8 @@ class Game {
             
             const historyItem = {
                 grid: previousGrid,
-                score: previousScore
+                score: previousScore,
+                moves: this.moves - 1
             };
             
             if (this.history.length >= this.maxUndoCount) {
@@ -533,10 +534,12 @@ class Game {
         const previousState = this.history.pop();
         this.grid = previousState.grid;
         this.score = previousState.score;
+        this.moves = previousState.moves !== undefined ? previousState.moves : this.moves - 1;
         this.gameOver = false;
         
         this.updateScore();
         this.updateUndoCount();
+        this.updateMovesCount();
         this.hideGameMessage();
         
         this.tileContainer.innerHTML = '';
