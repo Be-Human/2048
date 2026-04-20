@@ -400,7 +400,7 @@ body {
     font-size: 45px;
     font-weight: bold;
     z-index: 10;
-    transition: transform 0.15s ease-in-out, opacity 0.15s ease-in-out;
+    transition: transform 0.15s ease-in-out, opacity 0.15s ease-in-out, left 0.15s ease-in-out, top 0.15s ease-in-out;
 }
 
 .tile-inner {

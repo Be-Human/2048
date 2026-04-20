@@ -396,12 +396,199 @@ class Game {
             tile.classList.remove('tile-new');
         });
         
+        const movedTiles = [];
+        const mergedTiles = [];
+        const usedPrevious = new Set();
+        const usedCurrent = new Set();
+        
+        for (const merge of this.merges) {
+            const targetRow = merge.row;
+            const targetCol = merge.col;
+            const targetValue = merge.value;
+            const sourceValue = targetValue / 2;
+            
+            const sources = [];
+            
+            switch (direction) {
+                case 'left':
+                    for (let col = targetCol + 1; col < 4; col++) {
+                        if (previousGrid[targetRow][col] === sourceValue && sources.length < 2) {
+                            sources.push({ row: targetRow, col });
+                        }
+                    }
+                    if (sources.length < 2 && previousGrid[targetRow][targetCol] === sourceValue) {
+                        sources.unshift({ row: targetRow, col: targetCol });
+                    }
+                    break;
+                    
+                case 'right':
+                    for (let col = targetCol - 1; col >= 0; col--) {
+                        if (previousGrid[targetRow][col] === sourceValue && sources.length < 2) {
+                            sources.push({ row: targetRow, col });
+                        }
+                    }
+                    if (sources.length < 2 && previousGrid[targetRow][targetCol] === sourceValue) {
+                        sources.unshift({ row: targetRow, col: targetCol });
+                    }
+                    break;
+                    
+                case 'up':
+                    for (let row = targetRow + 1; row < 4; row++) {
+                        if (previousGrid[row][targetCol] === sourceValue && sources.length < 2) {
+                            sources.push({ row, col: targetCol });
+                        }
+                    }
+                    if (sources.length < 2 && previousGrid[targetRow][targetCol] === sourceValue) {
+                        sources.unshift({ row: targetRow, col: targetCol });
+                    }
+                    break;
+                    
+                case 'down':
+                    for (let row = targetRow - 1; row >= 0; row--) {
+                        if (previousGrid[row][targetCol] === sourceValue && sources.length < 2) {
+                            sources.push({ row, col: targetCol });
+                        }
+                    }
+                    if (sources.length < 2 && previousGrid[targetRow][targetCol] === sourceValue) {
+                        sources.unshift({ row: targetRow, col: targetCol });
+                    }
+                    break;
+            }
+            
+            if (sources.length === 2) {
+                mergedTiles.push({
+                    targetRow,
+                    targetCol,
+                    value: targetValue,
+                    sources: sources
+                });
+                
+                usedPrevious.add(`${sources[0].row},${sources[0].col}`);
+                usedPrevious.add(`${sources[1].row},${sources[1].col}`);
+                usedCurrent.add(`${targetRow},${targetCol}`);
+            }
+        }
+        
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 4; col++) {
+                const currentValue = this.grid[row][col];
+                if (currentValue === null) continue;
+                if (usedCurrent.has(`${row},${col}`)) continue;
+                
+                let foundSource = null;
+                
+                switch (direction) {
+                    case 'left':
+                        for (let c = col; c < 4; c++) {
+                            if (previousGrid[row][c] === currentValue && !usedPrevious.has(`${row},${c}`)) {
+                                foundSource = { row, col: c };
+                                break;
+                            }
+                        }
+                        break;
+                        
+                    case 'right':
+                        for (let c = col; c >= 0; c--) {
+                            if (previousGrid[row][c] === currentValue && !usedPrevious.has(`${row},${c}`)) {
+                                foundSource = { row, col: c };
+                                break;
+                            }
+                        }
+                        break;
+                        
+                    case 'up':
+                        for (let r = row; r < 4; r++) {
+                            if (previousGrid[r][col] === currentValue && !usedPrevious.has(`${r},${col}`)) {
+                                foundSource = { row: r, col };
+                                break;
+                            }
+                        }
+                        break;
+                        
+                    case 'down':
+                        for (let r = row; r >= 0; r--) {
+                            if (previousGrid[r][col] === currentValue && !usedPrevious.has(`${r},${col}`)) {
+                                foundSource = { row: r, col };
+                                break;
+                            }
+                        }
+                        break;
+                }
+                
+                if (foundSource && !(foundSource.row === row && foundSource.col === col)) {
+                    movedTiles.push({
+                        fromRow: foundSource.row,
+                        fromCol: foundSource.col,
+                        toRow: row,
+                        toCol: col,
+                        value: currentValue
+                    });
+                    usedPrevious.add(`${foundSource.row},${foundSource.col}`);
+                    usedCurrent.add(`${row},${col}`);
+                }
+            }
+        }
+        
         this.tileContainer.innerHTML = '';
+        
+        for (const movedTile of movedTiles) {
+            const tile = this.createTile(movedTile.fromRow, movedTile.fromCol, movedTile.value);
+            requestAnimationFrame(() => {
+                tile.style.left = `${this.getPosition(movedTile.toCol)}px`;
+                tile.style.top = `${this.getPosition(movedTile.toRow)}px`;
+            });
+        }
+        
+        for (const mergedTile of mergedTiles) {
+            for (const source of mergedTile.sources) {
+                const tile = this.createTile(source.row, source.col, source.value);
+                requestAnimationFrame(() => {
+                    tile.style.left = `${this.getPosition(mergedTile.targetCol)}px`;
+                    tile.style.top = `${this.getPosition(mergedTile.targetRow)}px`;
+                });
+            }
+            
+            setTimeout(() => {
+                const allTiles = this.tileContainer.querySelectorAll('.tile');
+                const tilesToRemove = [];
+                
+                for (const tile of allTiles) {
+                    const tileLeft = parseFloat(tile.style.left);
+                    const tileTop = parseFloat(tile.style.top);
+                    const targetLeft = this.getPosition(mergedTile.targetCol);
+                    const targetTop = this.getPosition(mergedTile.targetRow);
+                    
+                    if (Math.abs(tileLeft - targetLeft) < 1 && Math.abs(tileTop - targetTop) < 1) {
+                        tilesToRemove.push(tile);
+                    }
+                }
+                
+                for (const tile of tilesToRemove) {
+                    tile.remove();
+                }
+                
+                const mergedTileElement = this.createTile(
+                    mergedTile.targetRow, 
+                    mergedTile.targetCol, 
+                    mergedTile.value
+                );
+                mergedTileElement.classList.add('tile-merged');
+            }, 150);
+        }
         
         for (let row = 0; row < 4; row++) {
             for (let col = 0; col < 4; col++) {
                 if (this.grid[row][col] !== null) {
-                    this.createTile(row, col, this.grid[row][col]);
+                    const isMoved = movedTiles.some(
+                        t => t.toRow === row && t.toCol === col
+                    );
+                    const isMerged = mergedTiles.some(
+                        t => t.targetRow === row && t.targetCol === col
+                    );
+                    
+                    if (!isMoved && !isMerged) {
+                        this.createTile(row, col, this.grid[row][col]);
+                    }
                 }
             }
         }
