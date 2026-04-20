@@ -112,7 +112,64 @@ class Game {
         }
     }
     
+    handleSwipe() {
+        if (this.gameOver || (this.won && !this.keepPlaying)) return;
+        
+        const deltaX = this.touchEndX - this.touchStartX;
+        const deltaY = this.touchEndY - this.touchStartY;
+        
+        const minSwipeDistance = 30;
+        
+        if (Math.abs(deltaX) < minSwipeDistance && Math.abs(deltaY) < minSwipeDistance) {
+            return;
+        }
+        
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            if (deltaX > 0) {
+                this.move('right');
+            } else {
+                this.move('left');
+            }
+        } else {
+            if (deltaY > 0) {
+                this.move('down');
+            } else {
+                this.move('up');
+            }
+        }
+    }
+    
     bindEvents() {
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+        this.touchEndX = 0;
+        this.touchEndY = 0;
+        
+        const gameContainer = document.getElementById('gameContainer');
+        
+        if (gameContainer) {
+            gameContainer.addEventListener('touchstart', (e) => {
+                this.touchStartX = e.touches[0].clientX;
+                this.touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+            
+            gameContainer.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+            
+            gameContainer.addEventListener('touchend', (e) => {
+                if (e.changedTouches && e.changedTouches.length > 0) {
+                    this.touchEndX = e.changedTouches[0].clientX;
+                    this.touchEndY = e.changedTouches[0].clientY;
+                    this.handleSwipe();
+                }
+            }, { passive: true });
+        }
+        
+        window.addEventListener('resize', () => {
+            this.updateTilePositions();
+        });
+        
         document.addEventListener('keydown', (e) => {
             if (e.key === 'z' || e.key === 'Z') {
                 e.preventDefault();
@@ -245,10 +302,38 @@ class Game {
         return tile;
     }
     
+    getCellSize() {
+        const gridCell = document.querySelector('.grid-cell');
+        if (gridCell) {
+            return gridCell.offsetWidth;
+        }
+        return 106.25;
+    }
+    
+    getCellGap() {
+        const gridContainer = document.querySelector('.grid-container');
+        if (gridContainer) {
+            const computedStyle = window.getComputedStyle(gridContainer);
+            return parseFloat(computedStyle.gap) || parseFloat(computedStyle.rowGap) || 15;
+        }
+        return 15;
+    }
+    
     getPosition(index) {
-        const cellSize = 106.25;
-        const gap = 15;
+        const cellSize = this.getCellSize();
+        const gap = this.getCellGap();
         return index * (cellSize + gap);
+    }
+    
+    updateTilePositions() {
+        this.clearTiles();
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 4; col++) {
+                if (this.grid[row][col] !== null) {
+                    this.createTile(row, col, this.grid[row][col]);
+                }
+            }
+        }
     }
     
     move(direction) {
@@ -610,12 +695,15 @@ class Game {
     }
     
     showMergeAnimations() {
+        const cellSize = this.getCellSize();
+        const cellCenter = cellSize / 2;
+        
         for (const merge of this.merges) {
             const scoreAnimation = document.createElement('div');
             scoreAnimation.className = 'score-animation';
             scoreAnimation.textContent = `+${merge.value}`;
-            scoreAnimation.style.left = `${this.getPosition(merge.col) + 53}px`;
-            scoreAnimation.style.top = `${this.getPosition(merge.row) + 53}px`;
+            scoreAnimation.style.left = `${this.getPosition(merge.col) + cellCenter}px`;
+            scoreAnimation.style.top = `${this.getPosition(merge.row) + cellCenter}px`;
             
             this.tileContainer.appendChild(scoreAnimation);
             
