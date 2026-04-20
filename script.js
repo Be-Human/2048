@@ -202,7 +202,16 @@ class Game {
         const newGameButton = document.getElementById('newGameButton');
         if (newGameButton) {
             newGameButton.addEventListener('click', () => {
-                this.init();
+                const isGameActive = !this.gameOver && !(this.won && !this.keepPlaying);
+                const hasProgress = this.score > 0 || this.moves > 0;
+                
+                if (isGameActive && hasProgress) {
+                    if (confirm('游戏进行中，确定要开始新游戏吗？当前进度将丢失。')) {
+                        this.init();
+                    }
+                } else {
+                    this.init();
+                }
             });
         }
         
@@ -920,9 +929,23 @@ class Game {
         this.gameMessageText.textContent = message;
         this.continueButton.style.display = 'none';
         
+        const maxTile = this.getMaxTileValue();
+        let infoText = '';
+        
+        if (maxTile > 0) {
+            infoText = `本局最高方块：${maxTile}`;
+        }
+        
         if (rank && this.rankMessage) {
             const rankEmoji = this.getRankEmoji(rank);
-            this.rankMessage.textContent = `本局排名：${rankEmoji} 第${rank}名`;
+            if (infoText) {
+                infoText += ' | ';
+            }
+            infoText += `本局排名：${rankEmoji} 第${rank}名`;
+        }
+        
+        if (this.rankMessage && infoText) {
+            this.rankMessage.textContent = infoText;
             this.rankMessage.style.display = 'block';
         } else if (this.rankMessage) {
             this.rankMessage.style.display = 'none';
@@ -936,6 +959,18 @@ class Game {
         if (rank === 2) return '🥈';
         if (rank === 3) return '🥉';
         return `#${rank}`;
+    }
+    
+    getMaxTileValue() {
+        let maxValue = 0;
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 4; col++) {
+                if (this.grid[row][col] !== null && this.grid[row][col] > maxValue) {
+                    maxValue = this.grid[row][col];
+                }
+            }
+        }
+        return maxValue;
     }
     
     hideGameMessage() {
@@ -1041,6 +1076,12 @@ class Game {
         if (confirm('确定要清空所有排行榜记录吗？')) {
             localStorage.removeItem('leaderboard');
             this.renderLeaderboard();
+            
+            if (confirm('是否同时重置最高分？')) {
+                this.bestScore = 0;
+                this.bestScoreElement.textContent = '0';
+                this.setBestScore(0);
+            }
         }
     }
     
