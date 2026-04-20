@@ -930,22 +930,22 @@ class Game {
         this.continueButton.style.display = 'none';
         
         const maxTile = this.getMaxTileValue();
-        let infoText = '';
+        let infoHtml = '';
         
         if (maxTile > 0) {
-            infoText = `本局最高方块：${maxTile}`;
+            infoHtml = `本局最高方块：${maxTile}`;
         }
         
         if (rank && this.rankMessage) {
             const rankEmoji = this.getRankEmoji(rank);
-            if (infoText) {
-                infoText += ' | ';
+            if (infoHtml) {
+                infoHtml += '<br>';
             }
-            infoText += `本局排名：${rankEmoji} 第${rank}名`;
+            infoHtml += `本局排名：${rankEmoji} 第${rank}名`;
         }
         
-        if (this.rankMessage && infoText) {
-            this.rankMessage.textContent = infoText;
+        if (this.rankMessage && infoHtml) {
+            this.rankMessage.innerHTML = infoHtml;
             this.rankMessage.style.display = 'block';
         } else if (this.rankMessage) {
             this.rankMessage.style.display = 'none';
