@@ -8,7 +8,6 @@ class Game {
         this.keepPlaying = false;
         this.history = [];
         this.maxUndoCount = 3;
-        this.undoUsed = 0;
         this.moves = 0;
         this.time = 0;
         this.timer = null;
@@ -48,7 +47,6 @@ class Game {
         this.won = false;
         this.keepPlaying = false;
         this.history = [];
-        this.undoUsed = 0;
         this.moves = 0;
         this.time = 0;
         this.startTime = null;
@@ -76,7 +74,6 @@ class Game {
             this.won = savedState.won || false;
             this.keepPlaying = savedState.keepPlaying || false;
             this.history = savedState.history || [];
-            this.undoUsed = savedState.undoUsed || 0;
             this.moves = savedState.moves || 0;
             this.time = savedState.time || 0;
             this.startTime = savedState.startTime || null;
@@ -277,7 +274,6 @@ class Game {
             }
             
             this.history.push(historyItem);
-            this.undoUsed = 0;
             this.updateUndoCount();
             
             setTimeout(() => {
@@ -438,7 +434,7 @@ class Game {
     
     updateUndoCount() {
         if (this.undoCountElement) {
-            this.undoCountElement.textContent = this.maxUndoCount - this.undoUsed;
+            this.undoCountElement.textContent = this.history.length;
         }
     }
     
@@ -502,7 +498,6 @@ class Game {
             won: this.won,
             keepPlaying: this.keepPlaying,
             history: this.history,
-            undoUsed: this.undoUsed,
             moves: this.moves,
             time: this.time,
             startTime: this.startTime
@@ -531,14 +526,13 @@ class Game {
     }
     
     undo() {
-        if (this.undoUsed >= this.maxUndoCount || this.history.length === 0) {
+        if (this.history.length === 0) {
             return false;
         }
         
         const previousState = this.history.pop();
         this.grid = previousState.grid;
         this.score = previousState.score;
-        this.undoUsed++;
         this.gameOver = false;
         
         this.updateScore();
