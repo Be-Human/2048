@@ -531,23 +531,55 @@ class Game {
         
         this.tileContainer.innerHTML = '';
         
+        const tilesToAnimate = [];
+        
         for (const movedTile of movedTiles) {
             const tile = this.createTile(movedTile.fromRow, movedTile.fromCol, movedTile.value);
-            requestAnimationFrame(() => {
-                tile.style.left = `${this.getPosition(movedTile.toCol)}px`;
-                tile.style.top = `${this.getPosition(movedTile.toRow)}px`;
+            tilesToAnimate.push({
+                tile,
+                toCol: movedTile.toCol,
+                toRow: movedTile.toRow
             });
         }
         
         for (const mergedTile of mergedTiles) {
             for (const source of mergedTile.sources) {
                 const tile = this.createTile(source.row, source.col, source.value);
-                requestAnimationFrame(() => {
-                    tile.style.left = `${this.getPosition(mergedTile.targetCol)}px`;
-                    tile.style.top = `${this.getPosition(mergedTile.targetRow)}px`;
+                tilesToAnimate.push({
+                    tile,
+                    toCol: mergedTile.targetCol,
+                    toRow: mergedTile.targetRow
                 });
             }
+        }
+        
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 4; col++) {
+                if (this.grid[row][col] !== null) {
+                    const isMoved = movedTiles.some(
+                        t => t.toRow === row && t.toCol === col
+                    );
+                    const isMerged = mergedTiles.some(
+                        t => t.targetRow === row && t.targetCol === col
+                    );
+                    
+                    if (!isMoved && !isMerged) {
+                        this.createTile(row, col, this.grid[row][col]);
+                    }
+                }
+            }
+        }
+        
+        if (tilesToAnimate.length > 0) {
+            void this.tileContainer.offsetHeight;
             
+            for (const { tile, toCol, toRow } of tilesToAnimate) {
+                tile.style.left = `${this.getPosition(toCol)}px`;
+                tile.style.top = `${this.getPosition(toRow)}px`;
+            }
+        }
+        
+        for (const mergedTile of mergedTiles) {
             setTimeout(() => {
                 const allTiles = this.tileContainer.querySelectorAll('.tile');
                 const tilesToRemove = [];
@@ -574,23 +606,6 @@ class Game {
                 );
                 mergedTileElement.classList.add('tile-merged');
             }, 150);
-        }
-        
-        for (let row = 0; row < 4; row++) {
-            for (let col = 0; col < 4; col++) {
-                if (this.grid[row][col] !== null) {
-                    const isMoved = movedTiles.some(
-                        t => t.toRow === row && t.toCol === col
-                    );
-                    const isMerged = mergedTiles.some(
-                        t => t.targetRow === row && t.targetCol === col
-                    );
-                    
-                    if (!isMoved && !isMerged) {
-                        this.createTile(row, col, this.grid[row][col]);
-                    }
-                }
-            }
         }
     }
     
