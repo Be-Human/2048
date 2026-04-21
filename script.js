@@ -8,6 +8,7 @@ class Game {
         this.keepPlaying = false;
         this.history = [];
         this.maxUndoCount = 3;
+        this.savedToLeaderboard = false;
         this.moves = 0;
         this.time = 0;
         this.timer = null;
@@ -22,6 +23,7 @@ class Game {
         this.gameMessageText = this.gameMessage.querySelector('p:first-of-type');
         this.rankMessage = document.getElementById('rankMessage');
         this.continueButton = document.getElementById('continueButton');
+        this.copyScoreButton = document.getElementById('copyScoreButton');
         this.merges = [];
         this.leaderboardModal = document.getElementById('leaderboardModal');
         this.leaderboardList = document.getElementById('leaderboardList');
@@ -47,6 +49,7 @@ class Game {
         this.won = false;
         this.keepPlaying = false;
         this.history = [];
+        this.savedToLeaderboard = false;
         this.moves = 0;
         this.time = 0;
         this.startTime = null;
@@ -74,6 +77,7 @@ class Game {
             this.won = savedState.won || false;
             this.keepPlaying = savedState.keepPlaying || false;
             this.history = savedState.history || [];
+            this.savedToLeaderboard = savedState.savedToLeaderboard || false;
             this.moves = savedState.moves || 0;
             this.time = savedState.time || 0;
             this.startTime = savedState.startTime || null;
@@ -231,6 +235,12 @@ class Game {
                     this.resumeTimer();
                 }
                 this.saveGameState();
+            });
+        }
+        
+        if (this.copyScoreButton) {
+            this.copyScoreButton.addEventListener('click', () => {
+                this.copyScoreToClipboard();
             });
         }
         
@@ -798,6 +808,7 @@ class Game {
             won: this.won,
             keepPlaying: this.keepPlaying,
             history: this.history,
+            savedToLeaderboard: this.savedToLeaderboard,
             moves: this.moves,
             time: this.time,
             startTime: this.startTime
@@ -892,7 +903,13 @@ class Game {
         
         this.gameOver = true;
         this.stopTimer();
-        const rank = this.saveToLeaderboard(this.score);
+        
+        let rank = null;
+        if (!this.savedToLeaderboard) {
+            rank = this.saveToLeaderboard(this.score);
+            this.savedToLeaderboard = true;
+        }
+        
         this.showGameMessage('游戏结束！', rank);
         this.saveGameState();
     }
@@ -1143,6 +1160,59 @@ class Game {
         });
         
         this.leaderboardList.innerHTML = html;
+    }
+    
+    copyScoreToClipboard() {
+        const minutes = Math.floor(this.time / 60);
+        const seconds = this.time % 60;
+        const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        
+        const scoreText = `2048游戏成绩
+得分：${this.score}
+步数：${this.moves}
+用时：${timeStr}`;
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(scoreText).then(() => {
+                this.showCopySuccess();
+            }).catch(() => {
+                this.fallbackCopy(scoreText);
+            });
+        } else {
+            this.fallbackCopy(scoreText);
+        }
+    }
+    
+    showCopySuccess() {
+        const originalText = this.copyScoreButton.textContent;
+        this.copyScoreButton.textContent = '已复制！';
+        this.copyScoreButton.classList.add('copy-success');
+        
+        setTimeout(() => {
+            this.copyScoreButton.textContent = originalText;
+            this.copyScoreButton.classList.remove('copy-success');
+        }, 2000);
+    }
+    
+    fallbackCopy(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        textArea.style.top = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            this.showCopySuccess();
+        } catch (err) {
+            console.error('复制失败:', err);
+            alert('复制失败，请手动复制');
+        }
+        
+        document.body.removeChild(textArea);
     }
 }
 
