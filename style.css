@@ -117,7 +117,8 @@ body {
 
 .new-game-button,
 .retry-button,
-.continue-button {
+.continue-button,
+.copy-score-button {
     background-color: #8f7a66;
     color: #f9f6f2;
     border: none;
@@ -133,8 +134,17 @@ body {
 
 .new-game-button:hover,
 .retry-button:hover,
-.continue-button:hover {
+.continue-button:hover,
+.copy-score-button:hover {
     background-color: #9f8b77;
+}
+
+.copy-score-button.copy-success {
+    background-color: #67c23a;
+}
+
+.copy-score-button.copy-success:hover {
+    background-color: #85ce61;
 }
 
 .theme-toggle-button {
@@ -712,6 +722,9 @@ body {
     
     .leaderboard-button,
     .new-game-button,
+    .retry-button,
+    .continue-button,
+    .copy-score-button,
     .theme-toggle-button {
         padding: 8px 15px;
         font-size: 16px;
@@ -875,6 +888,7 @@ body.dark-mode .score-value {
 body.dark-mode .new-game-button,
 body.dark-mode .retry-button,
 body.dark-mode .continue-button,
+body.dark-mode .copy-score-button,
 body.dark-mode .theme-toggle-button {
     background-color: #00adb5;
 }
@@ -882,8 +896,17 @@ body.dark-mode .theme-toggle-button {
 body.dark-mode .new-game-button:hover,
 body.dark-mode .retry-button:hover,
 body.dark-mode .continue-button:hover,
+body.dark-mode .copy-score-button:hover,
 body.dark-mode .theme-toggle-button:hover {
     background-color: #00b8c1;
+}
+
+body.dark-mode .copy-score-button.copy-success {
+    background-color: #67c23a;
+}
+
+body.dark-mode .copy-score-button.copy-success:hover {
+    background-color: #85ce61;
 }
 
 body.dark-mode .game-container {
