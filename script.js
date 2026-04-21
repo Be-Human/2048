@@ -8,7 +8,7 @@ class Game {
         this.keepPlaying = false;
         this.history = [];
         this.maxUndoCount = 3;
-        this.savedToLeaderboard = false;
+        this.gameSessionId = this.generateGameSessionId();
         this.moves = 0;
         this.time = 0;
         this.timer = null;
@@ -49,7 +49,7 @@ class Game {
         this.won = false;
         this.keepPlaying = false;
         this.history = [];
-        this.savedToLeaderboard = false;
+        this.gameSessionId = this.generateGameSessionId();
         this.moves = 0;
         this.time = 0;
         this.startTime = null;
@@ -77,7 +77,7 @@ class Game {
             this.won = savedState.won || false;
             this.keepPlaying = savedState.keepPlaying || false;
             this.history = savedState.history || [];
-            this.savedToLeaderboard = savedState.savedToLeaderboard || false;
+            this.gameSessionId = savedState.gameSessionId || this.gameSessionId;
             this.moves = savedState.moves || 0;
             this.time = savedState.time || 0;
             this.startTime = savedState.startTime || null;
@@ -808,7 +808,7 @@ class Game {
             won: this.won,
             keepPlaying: this.keepPlaying,
             history: this.history,
-            savedToLeaderboard: this.savedToLeaderboard,
+            gameSessionId: this.gameSessionId,
             moves: this.moves,
             time: this.time,
             startTime: this.startTime
@@ -904,11 +904,7 @@ class Game {
         this.gameOver = true;
         this.stopTimer();
         
-        let rank = null;
-        if (!this.savedToLeaderboard) {
-            rank = this.saveToLeaderboard(this.score);
-            this.savedToLeaderboard = true;
-        }
+        const rank = this.saveToLeaderboard(this.score);
         
         this.showGameMessage('游戏结束！', rank);
         this.saveGameState();
@@ -1045,6 +1041,10 @@ class Game {
         return [];
     }
     
+    generateGameSessionId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+    
     saveToLeaderboard(score) {
         if (score <= 0) {
             return null;
@@ -1054,15 +1054,44 @@ class Game {
         const now = new Date();
         const dateStr = this.formatDate(now);
         
-        const newRecord = {
-            score: score,
-            moves: this.moves,
-            time: this.time,
-            date: dateStr,
-            timestamp: now.getTime()
-        };
+        const existingIndex = leaderboard.findIndex(
+            record => record.gameSessionId === this.gameSessionId
+        );
         
-        leaderboard.push(newRecord);
+        if (existingIndex !== -1) {
+            const existingRecord = leaderboard[existingIndex];
+            if (score > existingRecord.score) {
+                leaderboard[existingIndex] = {
+                    ...existingRecord,
+                    score: score,
+                    moves: this.moves,
+                    time: this.time,
+                    date: dateStr,
+                    timestamp: now.getTime()
+                };
+            } else {
+                leaderboard.sort((a, b) => {
+                    if (b.score !== a.score) {
+                        return b.score - a.score;
+                    }
+                    return b.timestamp - a.timestamp;
+                });
+                const rank = leaderboard.findIndex(
+                    record => record.gameSessionId === this.gameSessionId
+                );
+                return rank !== -1 ? rank + 1 : null;
+            }
+        } else {
+            const newRecord = {
+                score: score,
+                moves: this.moves,
+                time: this.time,
+                date: dateStr,
+                timestamp: now.getTime(),
+                gameSessionId: this.gameSessionId
+            };
+            leaderboard.push(newRecord);
+        }
         
         leaderboard.sort((a, b) => {
             if (b.score !== a.score) {
@@ -1075,7 +1104,9 @@ class Game {
         
         localStorage.setItem('leaderboard', JSON.stringify(top5));
         
-        const rank = top5.findIndex(record => record.timestamp === newRecord.timestamp);
+        const rank = top5.findIndex(
+            record => record.gameSessionId === this.gameSessionId
+        );
         return rank !== -1 ? rank + 1 : null;
     }
     
