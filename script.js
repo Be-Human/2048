@@ -158,7 +158,9 @@ class Game {
             }, { passive: true });
             
             gameContainer.addEventListener('touchmove', (e) => {
-                e.preventDefault();
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
             }, { passive: false });
             
             gameContainer.addEventListener('touchend', (e) => {
