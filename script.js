@@ -846,6 +846,8 @@ class Game {
         this.score = previousState.score;
         this.moves = previousState.moves !== undefined ? previousState.moves : this.moves - 1;
         this.gameOver = false;
+        this.won = false;
+        this.keepPlaying = false;
         
         this.updateScore();
         this.updateUndoCount();
@@ -859,6 +861,10 @@ class Game {
                     this.createTile(row, col, this.grid[row][col]);
                 }
             }
+        }
+        
+        if (this.moves > 0) {
+            this.resumeTimer();
         }
         
         this.saveGameState();
