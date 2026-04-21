@@ -403,10 +403,10 @@ body {
 
 .tile-container {
     position: absolute;
-    top: var(--grid-padding);
-    left: var(--grid-padding);
-    right: var(--grid-padding);
-    bottom: var(--grid-padding);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     pointer-events: none;
 }
 
@@ -923,62 +923,62 @@ body.dark-mode .grid-cell {
 }
 
 body.dark-mode .tile-2 .tile-inner {
-    background: #222831;
-    color: #f9f6f2;
+    background: #4a5568;
+    color: #e2e8f0;
 }
 
 body.dark-mode .tile-4 .tile-inner {
-    background: #393e46;
-    color: #f9f6f2;
+    background: #64748b;
+    color: #f1f5f9;
 }
 
 body.dark-mode .tile-8 .tile-inner {
-    background: #6c5ce7;
+    background: #6366f1;
     color: #f9f6f2;
 }
 
 body.dark-mode .tile-16 .tile-inner {
-    background: #a29bfe;
+    background: #818cf8;
     color: #f9f6f2;
 }
 
 body.dark-mode .tile-32 .tile-inner {
-    background: #00b894;
+    background: #3b82f6;
     color: #f9f6f2;
 }
 
 body.dark-mode .tile-64 .tile-inner {
-    background: #00cec9;
+    background: #2563eb;
     color: #f9f6f2;
 }
 
 body.dark-mode .tile-128 .tile-inner {
-    background: #fd79a8;
+    background: #06b6d4;
     color: #f9f6f2;
 }
 
 body.dark-mode .tile-256 .tile-inner {
-    background: #e84393;
+    background: #0891b2;
     color: #f9f6f2;
 }
 
 body.dark-mode .tile-512 .tile-inner {
-    background: #0984e3;
+    background: #ec4899;
     color: #f9f6f2;
 }
 
 body.dark-mode .tile-1024 .tile-inner {
-    background: #74b9ff;
+    background: #db2777;
     color: #f9f6f2;
 }
 
 body.dark-mode .tile-2048 .tile-inner {
-    background: #6c5ce7;
-    color: #f9f6f2;
+    background: #f59e0b;
+    color: #1f2937;
 }
 
 body.dark-mode .tile-super .tile-inner {
-    background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 50%, #fd79a8 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
     color: #f9f6f2;
 }
 
