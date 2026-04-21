@@ -393,7 +393,7 @@ body {
     border-radius: 3px;
     width: var(--cell-size);
     height: var(--cell-size);
-    flex: 1;
+    flex-shrink: 0;
 }
 
 .tile-container {
