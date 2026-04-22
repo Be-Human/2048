@@ -403,10 +403,10 @@ body {
 
 .tile-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: var(--grid-padding);
+    left: var(--grid-padding);
+    right: var(--grid-padding);
+    bottom: var(--grid-padding);
     pointer-events: none;
 }
 

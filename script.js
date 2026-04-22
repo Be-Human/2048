@@ -311,8 +311,8 @@ class Game {
         const tileInner = document.createElement('div');
         
         tile.className = `tile tile-${value}${isNew ? ' tile-new' : ''}`;
-        tile.style.left = `${this.getPosition(col)}px`;
-        tile.style.top = `${this.getPosition(row)}px`;
+        tile.style.left = `${this.getPosition(col, true)}px`;
+        tile.style.top = `${this.getPosition(row, false)}px`;
         
         tileInner.className = 'tile-inner';
         tileInner.textContent = value;
@@ -331,18 +331,26 @@ class Game {
         return 106.25;
     }
     
-    getCellGap() {
-        const gridContainer = document.querySelector('.grid-container');
-        if (gridContainer) {
-            const computedStyle = window.getComputedStyle(gridContainer);
-            return parseFloat(computedStyle.gap) || parseFloat(computedStyle.rowGap) || 15;
+    getCellGap(isHorizontal = false) {
+        if (isHorizontal) {
+            const gridRow = document.querySelector('.grid-row');
+            if (gridRow) {
+                const computedStyle = window.getComputedStyle(gridRow);
+                return parseFloat(computedStyle.gap) || parseFloat(computedStyle.columnGap) || 15;
+            }
+        } else {
+            const gridContainer = document.querySelector('.grid-container');
+            if (gridContainer) {
+                const computedStyle = window.getComputedStyle(gridContainer);
+                return parseFloat(computedStyle.gap) || parseFloat(computedStyle.rowGap) || 15;
+            }
         }
         return 15;
     }
     
-    getPosition(index) {
+    getPosition(index, isHorizontal = false) {
         const cellSize = this.getCellSize();
-        const gap = this.getCellGap();
+        const gap = this.getCellGap(isHorizontal);
         return index * (cellSize + gap);
     }
     
@@ -680,8 +688,8 @@ class Game {
             void this.tileContainer.offsetHeight;
             
             for (const { tile, toCol, toRow } of tilesToAnimate) {
-                tile.style.left = `${this.getPosition(toCol)}px`;
-                tile.style.top = `${this.getPosition(toRow)}px`;
+                tile.style.left = `${this.getPosition(toCol, true)}px`;
+                tile.style.top = `${this.getPosition(toRow, false)}px`;
             }
         }
         
@@ -693,8 +701,8 @@ class Game {
                 for (const tile of allTiles) {
                     const tileLeft = parseFloat(tile.style.left);
                     const tileTop = parseFloat(tile.style.top);
-                    const targetLeft = this.getPosition(mergedTile.targetCol);
-                    const targetTop = this.getPosition(mergedTile.targetRow);
+                    const targetLeft = this.getPosition(mergedTile.targetCol, true);
+                    const targetTop = this.getPosition(mergedTile.targetRow, false);
                     
                     if (Math.abs(tileLeft - targetLeft) < 1 && Math.abs(tileTop - targetTop) < 1) {
                         tilesToRemove.push(tile);
@@ -723,8 +731,8 @@ class Game {
             const scoreAnimation = document.createElement('div');
             scoreAnimation.className = 'score-animation';
             scoreAnimation.textContent = `+${merge.value}`;
-            scoreAnimation.style.left = `${this.getPosition(merge.col) + cellCenter}px`;
-            scoreAnimation.style.top = `${this.getPosition(merge.row) + cellCenter}px`;
+            scoreAnimation.style.left = `${this.getPosition(merge.col, true) + cellCenter}px`;
+            scoreAnimation.style.top = `${this.getPosition(merge.row, false) + cellCenter}px`;
             
             this.tileContainer.appendChild(scoreAnimation);
             
